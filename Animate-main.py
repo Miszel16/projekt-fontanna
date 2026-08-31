@@ -1,3 +1,19 @@
+"""
+Główny moduł aplikacji wizualizującej animowaną fontannę w środowisku OpenGL.
+
+Moduł inicjalizuje okno Pygame oraz kontekst OpenGL 3.3, tworzy materiały
+shaderowe, tekstury i obiekty sceny, a następnie uruchamia główną pętlę
+programu odpowiedzialną za obsługę zdarzeń, aktualizację kamery i systemu
+cząsteczek oraz renderowanie kolejnych klatek sceny.
+
+Renderowana scena składa się z:
+- tła sceny,
+- teksturowanej podłogi,
+- modelu fontanny,
+- powierzchni wody,
+- animowanych cząsteczek reprezentujących strumienie wody.
+"""
+
 import pygame
 from pygame.locals import *
 from OpenGL.GL import *
@@ -16,6 +32,42 @@ from Transformations import perspective_matrix
 SCREEN_WIDTH = 900
 SCREEN_HEIGHT = 700
 
+
+"""
+    Inicjalizuje aplikację i uruchamia główną pętlę renderowania sceny.
+
+    Przebieg działania:
+    1. Inicjalizuje bibliotekę Pygame.
+    2. Konfiguruje kontekst OpenGL 3.3 Core Profile oraz multisampling.
+    3. Tworzy okno renderujące z podwójnym buforowaniem i obsługą OpenGL.
+    4. Włącza test głębokości, blending oraz sterowanie rozmiarem punktów
+       z poziomu vertex shadera.
+    5. Tworzy materiały zawierające programy shaderowe używane przez
+       poszczególne elementy sceny.
+    6. Ładuje tekstury i inicjalizuje obiekty reprezentujące scenę,
+       podłoże, fontannę oraz powierzchnię wody.
+    7. Tworzy system cząsteczek fontanny oraz kamerę.
+    8. Wyznacza macierz projekcji perspektywicznej.
+    9. Uruchamia główną pętlę programu działającą z maksymalną
+       częstotliwością około 60 klatek na sekundę.
+    10. W każdej iteracji:
+        - oblicza czas od poprzedniej klatki,
+        - obsługuje zdarzenia użytkownika,
+        - aktualizuje położenie kamery,
+        - generuje nowe cząsteczki fontanny,
+        - aktualizuje istniejące cząsteczki,
+        - pobiera aktualną macierz widoku kamery,
+        - czyści bufory OpenGL,
+        - renderuje wszystkie elementy sceny,
+        - wyświetla gotową klatkę.
+    11. Kończy działanie po zamknięciu okna lub naciśnięciu klawisza ESC.
+
+    Args:
+        Brak.
+
+    Returns:
+        None
+    """
 
 def main():
     pygame.init()
