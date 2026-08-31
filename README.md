@@ -11,25 +11,6 @@ Kamerą można obracać dookoła fontanny.
 - Biblioteki: `pygame`, `PyOpenGL`, `numpy`
 - Karta graficzna obsługująca OpenGL 3.3
 
-## Instalacja i uruchomienie
-
-W folderze projektu:
-
-```bash
-# 1. Utwórz środowisko wirtualne
-py -3.12 -m venv venv           # lub: py -3.13 -m venv venv
-
-# 2. Aktywuj je
-venv\Scripts\Activate.ps1       # Windows PowerShell
-# venv\Scripts\activate.bat     # Windows cmd
-# source venv/bin/activate      # Linux / macOS
-
-# 3. Zainstaluj biblioteki
-python -m pip install -r requirements.txt
-
-# 4. Uruchom
-python Animate-main.py
-```
 
 ## Sterowanie
 
@@ -40,7 +21,7 @@ python Animate-main.py
 | `+` / `-`          | przybliżanie / oddalanie (zoom)    |
 | `Esc`              | wyjście                            |
 
-## Jak to działa (użyte techniki)
+## Działanie
 
 - **Point-sprite** - strumień wody to teksturowane punkty `GL_POINTS`.
   Shader wierzchołków ustawia `gl_PointSize` (rozmiar maleje z odległością od
@@ -80,6 +61,41 @@ TextureLoader.py    - wczytywanie tekstur z plików
 shaders/            - kod shaderów GLSL (scene, floor, particle)
 textures/           - obrazy tekstur (podłoga, fontanna, woda)
 ```
+
+
+## Dokumentacja
+
+Dokumentacja techniczna znajduje się bezpośrednio w kodzie źródłowym.
+
+Każdy moduł i klasa posiada opis swojego przeznaczenia, a funkcje i metody zostały udokumentowane za pomocą docstringów zawierających:
+
+opis działania,
+argumenty wejściowe,
+zwracane wartości.
+
+Główna funkcja programu zawiera również opis pełnego przebiegu inicjalizacji, aktualizacji oraz renderowania sceny.
+
+
+## Release
+v1.0.0
+
+Pierwsze kompletne wydanie projektu.
+
+Wersja obejmuje:
+
+kompletną scenę 3D,
+proceduralny model piętrowej fontanny,
+teksturowane elementy sceny,
+powierzchnie wody,
+system cząstek renderowany techniką point-sprite,
+fizykę ruchu kropli,
+kamerę orbitalną,
+własne macierze transformacji,
+obsługę shaderów, tekstur oraz buforów OpenGL,
+dokumentację techniczną kodu,
+konfigurację zależności przez requirements.txt.
+
+
 
 ## Autorzy
 
