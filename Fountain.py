@@ -1,3 +1,14 @@
+"""
+Moduł implementujący system cząsteczek reprezentujących wodę fontanny.
+
+Odpowiada za generowanie nowych kropli, przechowywanie ich parametrów,
+aktualizację ruchu pod wpływem grawitacji oraz przesyłanie aktualnych
+danych cząsteczek do GPU.
+
+Cząsteczki renderowane są jako punkty OpenGL wykorzystujące teksturę
+sprite'a do uzyskania wyglądu pojedynczych kropli wody.
+"""
+
 import math
 import random
 import numpy as np
@@ -28,7 +39,30 @@ PULSE_OFF = 1.6            # ile sekund przerwy
 
 
 class Fountain:
+    """
+    Reprezentuje system cząsteczek tworzących strumień wody fontanny.
+
+    Klasa zarządza pozycją, prędkością, czasem życia i kolorem
+    wszystkich cząsteczek oraz odpowiada za ich emisję,
+    aktualizację fizyki i renderowanie.
+    """
+
     def __init__(self, material, sprite_texture):
+        """
+        Inicjalizuje system cząsteczek fontanny.
+
+        Tworzy tablice przechowujące pozycje, prędkości, czas życia,
+        kolory i stan cząsteczek. Przygotowuje również VAO oraz dynamiczne
+        bufory danych przekazywane do vertex shadera.
+
+        Args:
+            material (Material): Materiał zawierający program shaderowy
+                używany do renderowania cząsteczek.
+            sprite_texture: Tekstura używana do renderowania pojedynczej kropli.
+
+        Returns:
+            None
+        """
         self.material = material
         self.sprite_texture = sprite_texture
 
@@ -53,8 +87,26 @@ class Fountain:
         self.col_data = GraphicsData("vec3", self.gpu_col, GL_DYNAMIC_DRAW)
         self.col_data.create_variable(material.program_id, "color")
 
+
+
+
+
     # ---- Nowe krople -----------------------------------------
     def spawn(self, n):
+        """
+        Generuje określoną liczbę nowych cząsteczek fontanny.
+
+        Dla każdej cząsteczki losuje kierunek ruchu poziomego,
+        prędkość pionową oraz początkowy moment jej trajektorii.
+        Na tej podstawie wyznacza początkową pozycję, prędkość,
+        pozostały czas życia i kolor kropli.
+
+        Args:
+            n (int): Liczba nowych cząsteczek do wygenerowania.
+
+        Returns:
+            None
+        """
         for _ in range(n):
             i = self.next_idx
             self.next_idx = (self.next_idx + 1) % MAX_PARTICLES
@@ -74,9 +126,25 @@ class Fountain:
             self.col[i] = random.choice(DROP_COLORS)   # losowy kolor z palety
             self.alive[i] = True
 
+
+
+
     # ---- emisja z uwzglednieniem pulsowania ------------------------------
     def emit(self, dt):
-        """Decyduje, czy w tej klatce rodzic krople (pulsowanie lub ciagle)."""
+        """
+        Steruje emisją nowych cząsteczek fontanny.
+
+        Przy wyłączonym trybie pulsacyjnym generuje nowe cząsteczki
+        w każdej klatce. Przy włączonym pulsowaniu wykorzystuje licznik
+        czasu do naprzemiennego włączania i zatrzymywania emisji.
+
+        Args:
+            dt (float): Czas od poprzedniej klatki wyrażony w sekundach.
+
+        Returns:
+            None
+        """
+        # Decyduje, czy w tej klatce rodzic krople (pulsowanie lub ciagle).
         if not PULSE:
             self.spawn(SPAWN_PER_FRAME)
             return
@@ -86,8 +154,26 @@ class Fountain:
         if phase < PULSE_ON:
             self.spawn(SPAWN_PER_FRAME)
 
+
+
     # ---- aktualizacja fizyki ---------------------------------------------
     def update(self, dt):
+        """
+        Aktualizuje fizykę i stan wszystkich aktywnych cząsteczek.
+
+        Uwzględnia działanie grawitacji, aktualizuje pozycję oraz
+        pozostały czas życia kropli. Dezaktywuje cząsteczki, które
+        zakończyły czas życia lub spadły poniżej poziomu sceny.
+
+        Po zakończeniu obliczeń aktualne dane cząsteczek są przesyłane
+        do dynamicznych buforów GPU.
+
+        Args:
+            dt (float): Czas od poprzedniej klatki wyrażony w sekundach.
+
+        Returns:
+            None
+        """
         a = self.alive
         self.vel[a, 1] += GRAVITY * dt
         self.pos[a] += self.vel[a] * dt
@@ -103,8 +189,25 @@ class Fountain:
         self.life_data.update(self.gpu_life)
         self.col_data.update(self.gpu_col)
 
+
+
+
     # ---- rysowanie point-sprite'ow ---------------------------------------
     def draw(self, projection, view):
+        """
+        Renderuje wszystkie cząsteczki fontanny.
+
+        Aktywuje materiał cząsteczek, przekazuje do shaderów macierz
+        projekcji, macierz widoku, skalę punktów oraz teksturę sprite'a.
+        Następnie renderuje cząsteczki jako punkty OpenGL.
+
+        Args:
+            projection (numpy.ndarray): Macierz projekcji 4x4.
+            view (numpy.ndarray): Macierz widoku 4x4 kamery.
+
+        Returns:
+            None
+        """
         self.material.use()
 
         proj_u = Uniform("mat4", projection)
