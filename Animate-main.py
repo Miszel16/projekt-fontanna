@@ -13,7 +13,9 @@ Renderowana scena składa się z:
 - powierzchni wody,
 - animowanych cząsteczek reprezentujących strumienie wody.
 """
-
+import os
+from pathlib import Path
+os.chdir(Path(__file__).resolve().parent)
 import pygame
 from pygame.locals import *
 from OpenGL.GL import *
