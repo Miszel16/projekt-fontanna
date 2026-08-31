@@ -1,3 +1,10 @@
+"""
+Moduł przechowujący wspólne parametry geometryczne fontanny.
+
+Definiuje wysokość centralnego słupa, poziom emisji cząsteczek wody
+oraz położenie dolnego i górnego talerza względem całkowitej
+wysokości słupa.
+"""
 
 # ====== GLOWNA WARTOSC: wysokosc slupa fontanny ======
 COLUMN_HEIGHT = 2.6
