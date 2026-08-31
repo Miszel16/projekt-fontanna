@@ -1,3 +1,11 @@
+"""
+Moduł odpowiedzialny za generowanie i renderowanie geometrii fontanny.
+
+Model fontanny tworzony jest programowo z prostych elementów geometrycznych.
+Moduł generuje pozycje wierzchołków oraz współrzędne UV dla poszczególnych
+części fontanny, a następnie przygotowuje dane do renderowania w OpenGL.
+"""
+
 import math
 import numpy as np
 from OpenGL.GL import *
@@ -9,8 +17,34 @@ TILES_U = 6.0    # ile razy tekstura owija sie wokol obwodu
 TILES_V = 2.0    # ile razy powtarza sie w pionie
 
 
+
 class FountainMesh:
+    """
+    Reprezentuje statyczny model geometryczny fontanny.
+
+    Klasa odpowiada za wygenerowanie geometrii fontanny,
+    przygotowanie danych wierzchołków i współrzędnych UV
+    oraz renderowanie modelu przy użyciu OpenGL.
+    """
+
+
     def __init__(self, material, texture):
+        """
+        Inicjalizuje model geometryczny fontanny.
+
+        Generuje geometrię modelu, zapisuje materiał i teksturę
+        oraz przygotowuje VAO i bufory danych zawierające pozycje
+        wierzchołków i współrzędne UV.
+
+        Args:
+                material (Material): Materiał zawierający program shaderowy
+                używany do renderowania fontanny.
+                texture: Tekstura nakładana na powierzchnię modelu.
+
+        Returns:
+                None
+        """
+
         self.material = material
         self.texture = texture
         positions, uvs = self._build()
@@ -23,11 +57,48 @@ class FountainMesh:
         self.uv_data = GraphicsData("vec2", uvs)
         self.uv_data.create_variable(material.program_id, "uv")
 
+
+
+
     def _build(self):
+        """
+        Generuje geometrię wszystkich elementów modelu fontanny.
+
+        Tworzy wierzchołki i współrzędne UV dla dolnego basenu,
+        dwóch talerzy oraz centralnego słupa. Powierzchnie modelu
+        budowane są z trójkątów rozmieszczonych wokół osi Y.
+
+        Returns:
+                tuple[numpy.ndarray, numpy.ndarray]:
+                Tablica pozycji wierzchołków oraz odpowiadająca jej
+                tablica współrzędnych UV.
+        """
+
         positions = []
         uvs = []
 
         def quad_uv(p1, p2, p3, p4, u0, u1, v0, v1):
+            """
+            Dodaje teksturowany czworokąt do generowanej geometrii.
+    
+            Czworokąt zdefiniowany przez cztery punkty dzielony jest
+            na dwa trójkąty. Do każdego wierzchołka przypisywane są
+            odpowiednie współrzędne UV.
+
+            Args:
+                    p1: Pierwszy wierzchołek czworokąta.
+                    p2: Drugi wierzchołek czworokąta.
+                    p3: Trzeci wierzchołek czworokąta.
+                    p4: Czwarty wierzchołek czworokąta.
+                    u0 (float): Początkowa współrzędna U tekstury.
+                    u1 (float): Końcowa współrzędna U tekstury.
+                    v0 (float): Początkowa współrzędna V tekstury.
+                    v1 (float): Końcowa współrzędna V tekstury.
+
+            Returns:
+                    None
+            """
+
             data = [(p1, (u0, v0)), (p2, (u1, v0)), (p3, (u1, v1)),
                     (p1, (u0, v0)), (p3, (u1, v1)), (p4, (u0, v1))]
             for p, uv in data:
@@ -63,7 +134,25 @@ class FountainMesh:
                     u0, u1, 1.0, 0.0)
 
         # ---- TALERZE na slupie --------------------------------------------
+
         def bowl(r_out_b, base_y, tw=0.25, th=0.28):
+            """
+            Generuje geometrię pojedynczego talerza fontanny.
+
+            Talerz tworzony jest z segmentów rozmieszczonych wokół osi Y.
+            Funkcja generuje jego powierzchnie oraz ściany i dodaje
+            odpowiadające im współrzędne UV.
+
+            Args:
+                    r_out_b (float): Zewnętrzny promień talerza.
+                    base_y (float): Położenie podstawy talerza w osi Y.
+                    tw (float): Grubość pierścienia talerza.
+                    th (float): Wysokość ściany talerza.
+
+            Returns:
+                    None
+            """
+
             r_in_b = r_out_b - tw
             for i in range(seg):
                 a0 = 2 * math.pi * i / seg
@@ -115,7 +204,24 @@ class FountainMesh:
         return (np.array(positions, np.float32),
                 np.array(uvs, np.float32))
 
+
+
     def draw(self, projection, view):
+        """
+        Renderuje model fontanny.
+        
+        Aktywuje materiał, przekazuje do programu shaderowego macierz
+        projekcji, macierz widoku oraz teksturę, a następnie renderuje
+        przygotowaną geometrię jako trójkąty OpenGL.
+        
+        Args:
+            projection (numpy.ndarray): Macierz projekcji 4x4.
+            view (numpy.ndarray): Macierz widoku 4x4 kamery.
+        
+        Returns: 
+            None
+        """
+
         self.material.use()
         proj_u = Uniform("mat4", projection)
         proj_u.find_variable(self.material.program_id, "projection_matrix")
