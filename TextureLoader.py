@@ -1,8 +1,35 @@
+"""
+Moduł odpowiedzialny za wczytywanie tekstur z plików graficznych.
+
+Wczytuje obraz za pomocą biblioteki Pygame, konwertuje go do formatu RGBA
+i tworzy na jego podstawie teksturę OpenGL. Konfiguruje również sposób
+powtarzania tekstury, filtrowanie, mipmapy oraz opcjonalne filtrowanie
+anizotropowe.
+"""
+
 import pygame
 from OpenGL.GL import *
 
 
 def load_texture(path):
+    """
+    Wczytuje obraz z pliku i tworzy na jego podstawie teksturę OpenGL.
+
+    Obraz jest ładowany za pomocą Pygame i konwertowany do surowych
+    danych RGBA. Następnie tworzony jest obiekt tekstury OpenGL,
+    do którego przesyłane są dane obrazu.
+
+    Funkcja ustawia powtarzanie tekstury w obu kierunkach, liniowe
+    filtrowanie oraz generuje mipmapy. Jeśli filtrowanie anizotropowe
+    jest obsługiwane przez środowisko OpenGL, ustawiana jest jego
+    maksymalna dostępna wartość.
+
+    Args:
+        path (str): Ścieżka do pliku graficznego zawierającego teksturę.
+
+    Returns:
+        int: Identyfikator utworzonej tekstury OpenGL.
+    """
     # wczytauje obraz i zamienia na surowe bajty RGBA
     surface = pygame.image.load(path)
     image_data = pygame.image.tostring(surface, "RGBA", True)
