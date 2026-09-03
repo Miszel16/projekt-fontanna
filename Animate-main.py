@@ -22,7 +22,7 @@ from OpenGL.GL import *
 
 from Material import Material
 from Camera import Camera
-from Texture import make_sprite_texture
+from Texture import make_sprite_texture   # proceduralna tekstura kropli (wariant zapasowy)
 from TextureLoader import load_texture
 from SceneMesh import SceneMesh
 from FloorMesh import FloorMesh
@@ -102,7 +102,8 @@ def main():
     fountain_mesh = FountainMesh(floor_material, fountain_tex)
     water_tex = load_texture("textures/woda.jpg")
     water = WaterMesh(floor_material, water_tex)
-    sprite_tex = make_sprite_texture()
+    # Tekstura point-sprite wczytana z pliku (lezka - obraca sie w shaderze).
+    sprite_tex = load_texture("textures/lezka.png")
     fountain = Fountain(particle_material, sprite_tex)
     camera = Camera()
 
