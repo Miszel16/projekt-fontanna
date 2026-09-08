@@ -73,7 +73,6 @@ SCREEN_HEIGHT = 700
 
 def main():
     pygame.init()
-    # konfiguracja kontekstu OpenGL pod shadery (jak w lab 17)
     pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
     pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 3)
     pygame.display.gl_set_attribute(
@@ -122,7 +121,7 @@ def main():
 
         # --- logika ---
         camera.update(dt)
-        fountain.emit(dt)          # emisja z pulsowaniem (patrz Fountain.py: PULSE)
+        fountain.emit(dt)          # emisja z pulsowaniem (Fountain.py: PULSE)
         fountain.update(dt)
         view = camera.get_VM()
 
