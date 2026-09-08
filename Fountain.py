@@ -2,11 +2,12 @@
 Moduł implementujący system cząsteczek reprezentujących wodę fontanny.
 
 Odpowiada za generowanie nowych kropli, przechowywanie ich parametrów,
-aktualizację ruchu pod wpływem grawitacji oraz przesyłanie aktualnych
-danych cząsteczek do GPU.
+aktualizację ruchu pod wpływem grawitacji, obsługę kolizji z geometrią
+fontanny oraz generowanie rozbryzgu po kontakcie z taflą wody.
 
 Cząsteczki renderowane są jako punkty OpenGL wykorzystujące teksturę
-sprite'a do uzyskania wyglądu pojedynczych kropli wody.
+łezki. Rozmiar i kąt obrotu każdej cząsteczki przekazywane są do GPU,
+dzięki czemu tekstura może być obracana zgodnie z kierunkiem ruchu.
 """
 
 import math
@@ -18,7 +19,7 @@ from Uniform import Uniform
 from Settings import EMIT_HEIGHT, LOWER_BOWL_Y, UPPER_BOWL_Y, COLUMN_HEIGHT   # geometria wspolna ze scena
 
 MAX_PARTICLES = 2000        # maksymalna liczba kropli (z zapasem na rozbryzgi)
-SPAWN_PER_FRAME = 1        # ile nowych kropli rodzi sie na klatke
+SPAWN_PER_FRAME = 4        # ile nowych kropli rodzi sie na klatke
 GRAVITY = -9.8             # przyspieszenie grawitacyjne
 PARTICLE_LIFETIME = 2.4     # czas zycia kropli (s)
 POINT_SCALE = 140.0          # bazowy rozmiar kropli (mniej = mniejsze krople)
@@ -28,7 +29,7 @@ POINT_SCALE = 140.0          # bazowy rozmiar kropli (mniej = mniejsze krople)
 # "plusku" lecacych w gore i na boki. Krople rozbryzgu NIE tworza kolejnego
 # rozbryzgu (zabezpieczenie przed lawina czastek).
 WATER_LEVEL = 0.2          # wysokosc tafli basenu (h*0.4 z WaterMesh, h=0.5)
-SPLASH_COUNT = 4           # ile malych kropli powstaje z jednego plusku
+SPLASH_COUNT = 6           # ile malych kropli powstaje z jednego plusku
 SPLASH_UP = 2.6            # predkosc pionowa kropli rozbryzgu (nizej niz glowny strumien)
 SPLASH_SIDE = 1.8          # predkosc pozioma rozbryzgu (rozrzut na boki)
 SPLASH_LIFETIME = 0.9      # krotkie zycie kropli rozbryzgu (s)
@@ -84,9 +85,10 @@ class Fountain:
     """
     Reprezentuje system cząsteczek tworzących strumień wody fontanny.
 
-    Klasa zarządza pozycją, prędkością, czasem życia i kolorem
-    wszystkich cząsteczek oraz odpowiada za ich emisję,
-    aktualizację fizyki i renderowanie.
+    Klasa zarządza pozycją, prędkością, czasem życia, kolorem,
+    rozmiarem i kątem obrotu wszystkich cząsteczek oraz odpowiada
+    za ich emisję, aktualizację fizyki, kolizje, rozbryzg
+    i renderowanie.
     """
 
     def __init__(self, material, sprite_texture):
@@ -342,7 +344,7 @@ class Fountain:
         czas życia lub spadły poniżej poziomu sceny.
 
         Po zakończeniu obliczeń aktualne dane cząsteczek (pozycja, czas
-        życia, kolor, kąt) są przesyłane do dynamicznych buforów GPU.
+        życia, kolor, kąt i rozmiar) są przesyłane do dynamicznych buforów GPU.
 
         Args:
             dt (float): Czas od poprzedniej klatki wyrażony w sekundach.
