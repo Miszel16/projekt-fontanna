@@ -7,6 +7,14 @@ System cząstek obsługuje kolizje z elementami fontanny
 oraz rozbryzg wody po kontakcie kropli z taflą.
 Kamerą można obracać dookoła fontanny.
 
+## Preview
+
+
+https://github.com/user-attachments/assets/c62e24b2-9713-4d57-9047-84e5e14ff324
+
+
+
+
 ## Wymagania
 
 - Python 3.12 lub nowszy (testowane na 3.12 i 3.13)
