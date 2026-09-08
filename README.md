@@ -84,7 +84,7 @@ Główna funkcja programu zawiera również opis pełnego przebiegu inicjalizacj
 
 
 ## Release
-v1.0.0
+v1.0
 
 Pierwsze kompletne wydanie projektu.
 
@@ -104,7 +104,7 @@ konfigurację zależności przez requirements.txt.
 
 
 ## Release
-v2.0.0
+v2.0
 
 Drugie kompletne wydanie projektu.
 
